@@ -1,4 +1,4 @@
-# Technical Test Project for Inditextech with React, Redux, and Vite
+# Technical Test Project for Inditextech with React
 
 This is a basic React project set up with Redux and Vite. It is a technical test project to showcase the use of these technologies.
 
