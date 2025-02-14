@@ -51,8 +51,8 @@ const App = () => {
 
       <button onClick={() => dispatch(addRow())}>Añadir Fila</button>
       <ul>
-        {rows.map((row) => (
-          <Row key={row.id} row={row} />
+        {rows.map((row, index) => (
+          <Row key={row.id} row={row} index={index} />
         ))}
       </ul>
     </div>

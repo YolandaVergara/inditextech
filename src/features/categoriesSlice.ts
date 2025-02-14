@@ -40,9 +40,16 @@ export const categoriesSlice = createSlice({
       if (newRow) {
         newRow.products.push({ product, alignment });
       }
-    }
+    },
+    reorderRows: (state, action: PayloadAction<{ fromIndex: number; toIndex: number }>) => {
+      const { fromIndex, toIndex } = action.payload;
+      if (fromIndex < 0 || toIndex < 0 || fromIndex >= state.rows.length || toIndex >= state.rows.length) return;
+
+      const [movedRow] = state.rows.splice(fromIndex, 1);
+      state.rows.splice(toIndex, 0, movedRow);
+    },
   },
 });
 
-export const { addRow, removeRow, addNewProduct, addProductToRow } = categoriesSlice.actions;
+export const { addRow, removeRow, addNewProduct, addProductToRow, reorderRows } = categoriesSlice.actions;
 export default categoriesSlice.reducer;
