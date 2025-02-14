@@ -48,8 +48,25 @@ export const categoriesSlice = createSlice({
       const [movedRow] = state.rows.splice(fromIndex, 1);
       state.rows.splice(toIndex, 0, movedRow);
     },
+    removeProduct: (state, action: PayloadAction<string>) => {
+      const productId = action.payload;
+      state.products = state.products.filter((product) => product.id !== productId);
+
+      state.rows.forEach((row) => {
+        row.products = row.products.filter((p) => p.product.id !== productId);
+      });
+    },
+    removeProductFromRow: (state, action: PayloadAction<{ rowId: string; productId: string }>) => {
+      const { rowId, productId } = action.payload;
+
+      const row = state.rows.find((r) => r.id === rowId);
+      if (row) {
+        row.products = row.products.filter((p) => p.product.id !== productId);
+      }
+    },
+
   },
 });
 
-export const { addRow, removeRow, addNewProduct, addProductToRow, reorderRows } = categoriesSlice.actions;
+export const { addRow, removeRow, addNewProduct, addProductToRow, reorderRows, removeProduct, removeProductFromRow } = categoriesSlice.actions;
 export default categoriesSlice.reducer;
