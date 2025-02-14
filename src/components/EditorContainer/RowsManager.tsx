@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../store";
-import { addRow } from "../features/categoriesSlice";
+import { RootState } from "../../store";
+import { addRow } from "../../features/categoriesSlice";
 import Row from "./Row";
 
 const RowsManager = () => {

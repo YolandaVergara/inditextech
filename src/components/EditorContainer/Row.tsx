@@ -1,10 +1,11 @@
 import { useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../store";
-import { removeRow, addProductToRow, reorderRows, removeProductFromRow } from "../features/categoriesSlice";
+import { RootState } from "../../store";
+import { removeRow, addProductToRow, reorderRows, removeProductFromRow } from "../../features/categoriesSlice";
 import { useDrop, useDrag } from "react-dnd";
-import ProductCard from "./ProductCard";
-import { PositionedProduct, Product } from "../types/categoryTypes";
+import ProductCard from "../ProductsContainer/ProductCard";
+import { PositionedProduct, Product } from "../../types/categoryTypes";
+import "./Row.css";
 
 const Row = ({ row, index }: { row: { id: string; products: PositionedProduct[] }; index: number }) => {
   const dispatch = useDispatch();
@@ -16,7 +17,6 @@ const Row = ({ row, index }: { row: { id: string; products: PositionedProduct[] 
   const centerRef = useRef<HTMLDivElement>(null);
   const rightRef = useRef<HTMLDivElement>(null);
 
-  // Drag and drop for rows 
   const [{ isDragging }, dragRow] = useDrag({
     type: "ROW",
     item: { index },
@@ -35,7 +35,6 @@ const Row = ({ row, index }: { row: { id: string; products: PositionedProduct[] 
     },
   });
 
-  // Drag and drop to move products between rows and inside each row
   const createDropHandler = (ref: React.MutableRefObject<HTMLDivElement | null>, alignment: "left" | "center" | "right") => {
     const [{ isOver }, drop] = useDrop({
       accept: "PRODUCT",
@@ -68,51 +67,36 @@ const Row = ({ row, index }: { row: { id: string; products: PositionedProduct[] 
   }, [dropRow, dragRow]);
 
   return (
-    <li ref={rowRef}
-      style={{
-        display: "flex",
-        gap: "10px",
-        padding: "10px",
-        border: "1px solid #ccc",
-        justifyContent: "space-around",
-        opacity: isDragging ? 0.5 : 1,
-        cursor: "move"
-      }}>
-      <button onClick={() => dispatch(removeRow(row.id))}>❌</button>
+    <li ref={rowRef} className={`row-container ${isDragging ? "dragging" : ""}`}>
+      <button className="delete-row" onClick={() => dispatch(removeRow(row.id))}>❌</button>
 
-      <div ref={left.ref as unknown as React.RefObject<HTMLDivElement>}
-        style={{ background: left.isOver ? "#ddd" : "white", flex: 1, padding: "10px", minHeight: "80px" }}>
+      <div ref={left.ref} className={`drop-zone ${left.isOver ? "hovered" : ""}`}>
         {updatedRow?.products.filter((p) => p.alignment === "left").map((p) => (
-          <div key={p.product.id} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div key={p.product.id} className="product-wrapper">
             <ProductCard product={p.product} isInRow={true} />
-            <button onClick={() => dispatch(removeProductFromRow({ rowId: row.id, productId: p.product.id }))}
-              style={{ background: "red", color: "white", border: "none", cursor: "pointer" }}>
+            <button className="delete-product" onClick={() => dispatch(removeProductFromRow({ rowId: row.id, productId: p.product.id }))}>
               🗑️
             </button>
           </div>
         ))}
       </div>
 
-      <div ref={center.ref as unknown as React.RefObject<HTMLDivElement>}
-        style={{ background: center.isOver ? "#ddd" : "white", flex: 1, padding: "10px", minHeight: "80px" }}>
+      <div ref={center.ref} className={`drop-zone ${center.isOver ? "hovered" : ""}`}>
         {updatedRow?.products.filter((p) => p.alignment === "center").map((p) => (
-          <div key={p.product.id} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div key={p.product.id} className="product-wrapper">
             <ProductCard product={p.product} isInRow={true} />
-            <button onClick={() => dispatch(removeProductFromRow({ rowId: row.id, productId: p.product.id }))}
-              style={{ background: "red", color: "white", border: "none", cursor: "pointer" }}>
+            <button className="delete-product" onClick={() => dispatch(removeProductFromRow({ rowId: row.id, productId: p.product.id }))}>
               🗑️
             </button>
           </div>
         ))}
       </div>
 
-      <div ref={right.ref as unknown as React.RefObject<HTMLDivElement>}
-        style={{ background: right.isOver ? "#ddd" : "white", flex: 1, padding: "10px", minHeight: "80px" }}>
+      <div ref={right.ref} className={`drop-zone ${right.isOver ? "hovered" : ""}`}>
         {updatedRow?.products.filter((p) => p.alignment === "right").map((p) => (
-          <div key={p.product.id} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div key={p.product.id} className="product-wrapper">
             <ProductCard product={p.product} isInRow={true} />
-            <button onClick={() => dispatch(removeProductFromRow({ rowId: row.id, productId: p.product.id }))}
-              style={{ background: "red", color: "white", border: "none", cursor: "pointer" }}>
+            <button className="delete-product" onClick={() => dispatch(removeProductFromRow({ rowId: row.id, productId: p.product.id }))}>
               🗑️
             </button>
           </div>

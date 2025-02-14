@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { addNewProduct } from "../features/categoriesSlice";
+import { addNewProduct } from "../../features/categoriesSlice";
+import "./AddProductForm.css";
 
 const AddProductForm = () => {
   const dispatch = useDispatch();
@@ -15,9 +16,9 @@ const AddProductForm = () => {
   };
 
   return (
-    <div>
+    <div className="form-container">
       <h2>Añadir Nuevo Producto</h2>
-      <form onSubmit={handleAddProduct} style={{ marginBottom: "20px" }}>
+      <form onSubmit={handleAddProduct} className="product-form">
         <input
           type="text"
           placeholder="Nombre del producto"

@@ -1,8 +1,9 @@
 import { useRef, useEffect } from "react";
 import { useDrag } from "react-dnd";
 import { useDispatch } from "react-redux";
-import { removeProduct } from "../features/categoriesSlice";
-import { Product } from "../types/categoryTypes";
+import { removeProduct } from "../../features/categoriesSlice";
+import { Product } from "../../types/categoryTypes";
+import "./ProductList.css";
 
 const ProductCard = ({ product, isInRow = false }: { product: Product; isInRow?: boolean }) => {
   const dispatch = useDispatch();
@@ -23,18 +24,14 @@ const ProductCard = ({ product, isInRow = false }: { product: Product; isInRow?:
   }, [drag]);
 
   return (
-    <div ref={ref}
-      style={{ opacity: isDragging ? 0.5 : 1, cursor: "grab", border: "1px solid #ddd", padding: "10px" }}>
-      <img src={product.imageUrl} alt={product.name} width="50" />
-      <div>
+    <div ref={ref} className="product-card" style={{ opacity: isDragging ? 0.5 : 1 }}>
+      <img src={product.imageUrl} alt={product.name} />
+      <div className="product-info">
         <p>{product.name}</p>
         <p>${product.price.toFixed(2)}</p>
-      </div>
-      {!isInRow && (
-        <button onClick={() => dispatch(removeProduct(product.id))} style={{ background: "red", color: "white", border: "none", cursor: "pointer" }}>
-          🗑️
-        </button>
-      )}
+        {!isInRow && (
+          <button onClick={() => dispatch(removeProduct(product.id))}>🗑️</button>
+        )}</div>
     </div>
   );
 };

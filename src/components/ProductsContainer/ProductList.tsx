@@ -1,17 +1,18 @@
 import { useSelector } from "react-redux";
-import { RootState } from "../store";
+import { RootState } from "../../store";
 import ProductCard from "./ProductCard";
+import "./ProductList.css"; // Importamos los estilos
 
 const ProductList = () => {
   const products = useSelector((state: RootState) => state.categories.products);
 
   return (
-    <div>
+    <div className="product-list-container">
       <h2>Productos Disponibles</h2>
-      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-        {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
+      <div className="product-list">
+        {
+          products.map((product) => <ProductCard key={product.id} product={product} />)
+        }
       </div>
     </div>
   );
