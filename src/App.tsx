@@ -1,16 +1,19 @@
-import React, { useState } from "react";
+import { useState, FormEvent } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "./store";
-import { addRow, removeRow, addNewProduct } from "./features/categoriesSlice";
+import { addRow, addNewProduct } from "./features/categoriesSlice";
+import Row from "./components/Row";
+import ProductCard from "./components/ProductCard";
+import { PositionedProduct } from "./types/categoryTypes";
 
 const App = () => {
   const dispatch = useDispatch();
-  const rows = useSelector((state: RootState) => state.categories.rows);
+  const rows = useSelector((state: RootState) => state.categories.rows as { id: string; products: PositionedProduct[] }[]);
   const products = useSelector((state: RootState) => state.categories.products);
 
   const [newProduct, setNewProduct] = useState({ name: "", price: "" });
 
-  const handleAddProduct = (e: React.FormEvent) => {
+  const handleAddProduct = (e: FormEvent) => {
     e.preventDefault();
     if (newProduct.name.trim() === "" || isNaN(Number(newProduct.price))) return;
 
@@ -22,7 +25,6 @@ const App = () => {
     <div>
       <h1>ZARA Jeans 👖</h1>
 
-      {/* Formulario para agregar un nuevo producto */}
       <h2>Añadir Nuevo Producto</h2>
       <form onSubmit={handleAddProduct} style={{ marginBottom: "20px" }}>
         <input
@@ -40,28 +42,17 @@ const App = () => {
         <button type="submit">Añadir Producto</button>
       </form>
 
-      {/* Listado de productos disponibles */}
       <h2>Productos Disponibles</h2>
       <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
         {products.map((product) => (
-          <div key={product.id} style={{ border: "1px solid #ccc", padding: "10px", borderRadius: "5px" }}>
-            <img src={product.imageUrl} alt={product.name} width="80" />
-            <p>{product.name}</p>
-            <p>${product.price.toFixed(2)}</p>
-          </div>
+          <ProductCard key={product.id} product={product} />
         ))}
       </div>
 
-      {/* Botón para agregar filas */}
       <button onClick={() => dispatch(addRow())}>Añadir Fila</button>
       <ul>
-        {rows.map(row => (
-          <li key={row.id}>
-            Fila {row.id}
-            <button onClick={() => dispatch(removeRow(row.id))} style={{ marginLeft: '10px' }}>
-              Eliminar Fila
-            </button>
-          </li>
+        {rows.map((row) => (
+          <Row key={row.id} row={row} />
         ))}
       </ul>
     </div>

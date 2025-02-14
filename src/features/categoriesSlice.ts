@@ -1,25 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { products } from "../utils/products";
-
-export interface Product {
-  id: string;
-  name: string;
-  price: number;
-  imageUrl: string;
-}
-
-export interface PositionedProduct {
-  product: Product;
-  alignment: "left" | "center" | "right";
-}
-
-interface CategoriesState {
-  products: Product[];
-  rows: {
-    id: string;
-    products: PositionedProduct[];
-  }[];
-}
+import { CategoriesState, Product } from "../types/categoryTypes";
 
 const initialState: CategoriesState = {
   products,
@@ -49,14 +30,17 @@ export const categoriesSlice = createSlice({
       state.products.push(newProduct);
     },
     addProductToRow: (state, action: PayloadAction<{ rowId: string; product: Product; alignment: "left" | "center" | "right" }>) => {
-      const row = state.rows.find((r) => r.id === action.payload.rowId);
-      if (row && row.products.length < 3) {
-        row.products.push({
-          product: action.payload.product,
-          alignment: action.payload.alignment,
-        });
+      const { rowId, product, alignment } = action.payload;
+
+      state.rows.forEach((row) => {
+        row.products = row.products.filter((p) => p.product.id !== product.id);
+      });
+
+      const newRow = state.rows.find((row) => row.id === rowId);
+      if (newRow) {
+        newRow.products.push({ product, alignment });
       }
-    },
+    }
   },
 });
 
