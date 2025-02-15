@@ -1,21 +1,20 @@
 import { useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
-import { removeRow, addProductToRow, reorderRows, removeProductFromRow } from "../../features/categoriesSlice";
+import { removeRow, addProductToRow, reorderRows, removeProductFromRow, setRowTemplate } from "../../features/categoriesSlice";
 import { useDrop, useDrag } from "react-dnd";
 import ProductCard from "../ProductsContainer/ProductCard";
 import { PositionedProduct, Product } from "../../types/categoryTypes";
 import "./Row.css";
 
-const Row = ({ row, index }: { row: { id: string; products: PositionedProduct[] }; index: number }) => {
+const Row = ({ row, index }: { row: { id: string; products: PositionedProduct[]; template?: "left" | "center" | "right" | null }; index: number }) => {
   const dispatch = useDispatch();
   const rows = useSelector((state: RootState) => state.categories.rows);
   const updatedRow = rows.find((r) => r.id === row.id);
+  const template = updatedRow?.template || "center";
 
   const rowRef = useRef<HTMLLIElement>(null);
-  const leftRef = useRef<HTMLDivElement>(null);
-  const centerRef = useRef<HTMLDivElement>(null);
-  const rightRef = useRef<HTMLDivElement>(null);
+  const dropRef = useRef<HTMLDivElement>(null);
 
   const [{ isDragging }, dragRow] = useDrag({
     type: "ROW",
@@ -35,7 +34,10 @@ const Row = ({ row, index }: { row: { id: string; products: PositionedProduct[] 
     },
   });
 
-  const createDropHandler = (ref: React.MutableRefObject<HTMLDivElement | null>, alignment: "left" | "center" | "right") => {
+  const createDropHandler = (
+    ref: React.MutableRefObject<HTMLDivElement | null>,
+    alignment: "dropZone"
+  ) => {
     const [{ isOver }, drop] = useDrop({
       accept: "PRODUCT",
       drop: (item: { product: Product }) => {
@@ -50,14 +52,12 @@ const Row = ({ row, index }: { row: { id: string; products: PositionedProduct[] 
       if (ref.current) {
         drop(ref.current);
       }
-    }, [drop]);
+    }, [drop, ref]);
 
     return { ref, isOver };
   };
 
-  const left = createDropHandler(leftRef, "left");
-  const center = createDropHandler(centerRef, "center");
-  const right = createDropHandler(rightRef, "right");
+  const dropZone = createDropHandler(dropRef, "dropZone");
 
   useEffect(() => {
     if (rowRef.current) {
@@ -66,34 +66,59 @@ const Row = ({ row, index }: { row: { id: string; products: PositionedProduct[] 
     }
   }, [dropRow, dragRow]);
 
+  const alignmentStyle = {
+    justifyContent:
+      template === "left"
+        ? "flex-start"
+        : template === "right"
+          ? "flex-end"
+          : "center",
+  };
+
+  const handleTemplateChange = (newTemplate: "left" | "center" | "right") => {
+    dispatch(setRowTemplate({ rowId: row.id, template: newTemplate }));
+  };
+
   return (
     <li ref={rowRef} className={`row-container ${isDragging ? "dragging" : ""}`}>
-      <button className="delete-row" onClick={() => dispatch(removeRow(row.id))}>❌</button>
+      <div>
+        <button className="delete-row" onClick={() => dispatch(removeRow(row.id))}>❌</button>
 
-      <div ref={left.ref} className={`drop-zone ${left.isOver ? "hovered" : ""}`}>
-        {updatedRow?.products.filter((p) => p.alignment === "left").map((p) => (
-          <div key={p.product.id} className="product-wrapper">
-            <ProductCard product={p.product} isInRow={true} />
-            <button className="delete-product" onClick={() => dispatch(removeProductFromRow({ rowId: row.id, productId: p.product.id }))}>
-              🗑️
-            </button>
-          </div>
-        ))}
+        <div className="row-template-selector">
+          <label>
+            <input
+              type="radio"
+              name={`template-${row.id}`}
+              value="left"
+              checked={template === "left"}
+              onChange={() => handleTemplateChange("left")}
+            />
+            Izquierda
+          </label>
+          <label>
+            <input
+              type="radio"
+              name={`template-${row.id}`}
+              value="center"
+              checked={template === "center"}
+              onChange={() => handleTemplateChange("center")}
+            />
+            Centro
+          </label>
+          <label>
+            <input
+              type="radio"
+              name={`template-${row.id}`}
+              value="right"
+              checked={template === "right"}
+              onChange={() => handleTemplateChange("right")}
+            />
+            Derecha
+          </label>
+        </div>
       </div>
-
-      <div ref={center.ref} className={`drop-zone ${center.isOver ? "hovered" : ""}`}>
-        {updatedRow?.products.filter((p) => p.alignment === "center").map((p) => (
-          <div key={p.product.id} className="product-wrapper">
-            <ProductCard product={p.product} isInRow={true} />
-            <button className="delete-product" onClick={() => dispatch(removeProductFromRow({ rowId: row.id, productId: p.product.id }))}>
-              🗑️
-            </button>
-          </div>
-        ))}
-      </div>
-
-      <div ref={right.ref} className={`drop-zone ${right.isOver ? "hovered" : ""}`}>
-        {updatedRow?.products.filter((p) => p.alignment === "right").map((p) => (
+      <div ref={dropZone.ref} className="drop-zone" style={alignmentStyle}>
+        {updatedRow?.products.map((p) => (
           <div key={p.product.id} className="product-wrapper">
             <ProductCard product={p.product} isInRow={true} />
             <button className="delete-product" onClick={() => dispatch(removeProductFromRow({ rowId: row.id, productId: p.product.id }))}>

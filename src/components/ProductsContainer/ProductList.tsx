@@ -2,6 +2,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import ProductCard from "./ProductCard";
 import "./ProductList.css"; // Importamos los estilos
+import { Product } from "../../types/categoryTypes";
 
 const ProductList = () => {
   const products = useSelector((state: RootState) => state.categories.products);
@@ -11,7 +12,7 @@ const ProductList = () => {
       <h2>Productos Disponibles</h2>
       <div className="product-list">
         {
-          products.map((product) => <ProductCard key={product.id} product={product} />)
+          products.map((product: Product) => <ProductCard key={product.id} product={product} />)
         }
       </div>
     </div>

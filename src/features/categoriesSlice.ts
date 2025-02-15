@@ -15,6 +15,7 @@ export const categoriesSlice = createSlice({
       state.rows.push({
         id: crypto.randomUUID(),
         products: [],
+        template: "center",
       });
     },
     removeRow: (state, action: PayloadAction<string>) => {
@@ -29,7 +30,7 @@ export const categoriesSlice = createSlice({
       };
       state.products.push(newProduct);
     },
-    addProductToRow: (state, action: PayloadAction<{ rowId: string; product: Product; alignment: "left" | "center" | "right" }>) => {
+    addProductToRow: (state, action: PayloadAction<{ rowId: string; product: Product; alignment: "dropZone" }>) => {
       const { rowId, product, alignment } = action.payload;
 
       state.rows.forEach((row) => {
@@ -37,7 +38,7 @@ export const categoriesSlice = createSlice({
       });
 
       const newRow = state.rows.find((row) => row.id === rowId);
-      if (newRow) {
+      if (newRow && newRow.products.length < 3) {
         newRow.products.push({ product, alignment });
       }
     },
@@ -64,9 +65,15 @@ export const categoriesSlice = createSlice({
         row.products = row.products.filter((p) => p.product.id !== productId);
       }
     },
-
+    setRowTemplate: (state, action: PayloadAction<{ rowId: string; template: "left" | "center" | "right" }>) => {
+      const { rowId, template } = action.payload;
+      const row = state.rows.find((row) => row.id === rowId);
+      if (row) {
+        row.template = template;
+      }
+    },
   },
 });
 
-export const { addRow, removeRow, addNewProduct, addProductToRow, reorderRows, removeProduct, removeProductFromRow } = categoriesSlice.actions;
+export const { addRow, removeRow, addNewProduct, addProductToRow, reorderRows, removeProduct, removeProductFromRow, setRowTemplate } = categoriesSlice.actions;
 export default categoriesSlice.reducer;

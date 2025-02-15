@@ -13,6 +13,7 @@ export interface PositionedProduct {
 export interface Row {
   id: string;
   products: PositionedProduct[];
+  template?: "left" | "center" | "right";
 }
 
 export interface CategoriesState {
