@@ -1,17 +1,17 @@
 import { useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
-import { removeRow, addProductToRow, reorderRows, removeProductFromRow, setRowTemplate } from "../../features/categoriesSlice";
+import { removeRow, addProductToRow, reorderRows, setRowTemplate } from "../../features/categoriesSlice";
 import { useDrop, useDrag } from "react-dnd";
 import ProductCard from "../ProductsContainer/ProductCard";
 import { PositionedProduct, Product } from "../../types/categoryTypes";
 import "./Row.css";
 
-const Row = ({ row, index }: { row: { id: string; products: PositionedProduct[]; template?: "left" | "center" | "right" | null }; index: number }) => {
+const Row = ({ row, index }: { row: { id: string; products: PositionedProduct[]; template?: "left" | "center" | "right" }; index: number }) => {
   const dispatch = useDispatch();
   const rows = useSelector((state: RootState) => state.categories.rows);
   const updatedRow = rows.find((r) => r.id === row.id);
-  const template = updatedRow?.template || "center";
+  const template = row.template || "center";
 
   const rowRef = useRef<HTMLLIElement>(null);
   const dropRef = useRef<HTMLDivElement>(null);
@@ -36,7 +36,7 @@ const Row = ({ row, index }: { row: { id: string; products: PositionedProduct[];
 
   const createDropHandler = (
     ref: React.MutableRefObject<HTMLDivElement | null>,
-    alignment: "dropZone"
+    alignment: "left" | "center" | "right"
   ) => {
     const [{ isOver }, drop] = useDrop({
       accept: "PRODUCT",
@@ -57,7 +57,7 @@ const Row = ({ row, index }: { row: { id: string; products: PositionedProduct[];
     return { ref, isOver };
   };
 
-  const dropZone = createDropHandler(dropRef, "dropZone");
+  const dropZone = createDropHandler(dropRef, template);
 
   useEffect(() => {
     if (rowRef.current) {
@@ -66,13 +66,21 @@ const Row = ({ row, index }: { row: { id: string; products: PositionedProduct[];
     }
   }, [dropRow, dragRow]);
 
-  const alignmentStyle = {
-    justifyContent:
-      template === "left"
-        ? "flex-start"
-        : template === "right"
-          ? "flex-end"
-          : "center",
+  const getContainerWidth = (totalProducts: number) => {
+    if (totalProducts === 1) return "33.33%";
+    if (totalProducts === 2) return "66.66%";
+    return "100%";
+  };
+
+  const totalProducts = updatedRow?.products.length || 0;
+  const containerWidth = getContainerWidth(totalProducts);
+  const containerStyle = {
+    display: "flex",
+    width: containerWidth,
+    marginLeft: template === "right" ? "auto" : template === "center" ? "auto" : "0",
+    marginRight: template === "left" ? "auto" : template === "center" ? "auto" : "0",
+    gap: "10px",
+    justifyContent: "space-between",
   };
 
   const handleTemplateChange = (newTemplate: "left" | "center" | "right") => {
@@ -81,9 +89,8 @@ const Row = ({ row, index }: { row: { id: string; products: PositionedProduct[];
 
   return (
     <li ref={rowRef} className={`row-container ${isDragging ? "dragging" : ""}`}>
-      <div>
-        <button className="delete-row" onClick={() => dispatch(removeRow(row.id))}>❌</button>
-
+      <div className="row-header">
+        <button className="delete-row" onClick={() => dispatch(removeRow(row.id))}>🗑️</button>
         <div className="row-template-selector">
           <label>
             <input
@@ -117,13 +124,10 @@ const Row = ({ row, index }: { row: { id: string; products: PositionedProduct[];
           </label>
         </div>
       </div>
-      <div ref={dropZone.ref} className="drop-zone" style={alignmentStyle}>
+      <div ref={dropZone.ref} className="drop-zone" style={containerStyle}>
         {updatedRow?.products.map((p) => (
-          <div key={p.product.id} className="product-wrapper">
-            <ProductCard product={p.product} isInRow={true} />
-            <button className="delete-product" onClick={() => dispatch(removeProductFromRow({ rowId: row.id, productId: p.product.id }))}>
-              🗑️
-            </button>
+          <div key={p.product.id} className="product-wrapper" style={{ flex: "1 0 33.33%" }}>
+            <ProductCard product={p.product} isInRow={true} rowId={row.id} />
           </div>
         ))}
       </div>

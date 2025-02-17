@@ -1,16 +1,13 @@
 .form-container {
   text-align: center;
+  padding: 10px;
 }
 
 .product-form {
   display: flex;
   align-items: center;
   gap: 10px;
-  max-width: 50%;
   margin: 0 auto;
-  padding: 20px;
-  background: white;
-  border-radius: 8px;
 }
 
 .product-form input {
@@ -25,10 +22,4 @@
 .product-form button {
   width: 100%;
   padding: 10px;
-  font-size: 16px;
-  color: grey;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background 0.2s;
 }

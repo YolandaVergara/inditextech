@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import ProductCard from "./ProductCard";
-import "./ProductList.css"; // Importamos los estilos
+import "./ProductList.css";
 import { Product } from "../../types/categoryTypes";
 
 const ProductList = () => {

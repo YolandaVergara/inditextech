@@ -1,11 +1,11 @@
 import { useRef, useEffect } from "react";
 import { useDrag } from "react-dnd";
 import { useDispatch } from "react-redux";
-import { removeProduct } from "../../features/categoriesSlice";
+import { removeProduct, removeProductFromRow } from "../../features/categoriesSlice";
 import { Product } from "../../types/categoryTypes";
 import "./ProductList.css";
 
-const ProductCard = ({ product, isInRow = false }: { product: Product; isInRow?: boolean }) => {
+const ProductCard = ({ product, isInRow = false, rowId }: { product: Product; isInRow?: boolean; row?: string; rowId?: string }) => {
   const dispatch = useDispatch();
   const ref = useRef<HTMLDivElement | null>(null);
 
@@ -26,12 +26,23 @@ const ProductCard = ({ product, isInRow = false }: { product: Product; isInRow?:
   return (
     <div ref={ref} className="product-card" style={{ opacity: isDragging ? 0.5 : 1 }}>
       <img src={product.imageUrl} alt={product.name} />
-      <div className="product-info">
-        <p>{product.name}</p>
-        <p>${product.price.toFixed(2)}</p>
-        {!isInRow && (
-          <button onClick={() => dispatch(removeProduct(product.id))}>🗑️</button>
-        )}</div>
+      <div className="product-footer">
+        <div className="product-info">
+          <p>{product.name}</p>
+          <p>${product.price.toFixed(2)}</p>
+        </div>
+        <button
+          onClick={() =>
+            dispatch(
+              isInRow && rowId
+                ? removeProductFromRow({ rowId, productId: product.id })
+                : removeProduct(product.id)
+            )
+          }
+        >
+          🗑️
+        </button>
+      </div>
     </div>
   );
 };

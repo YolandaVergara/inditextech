@@ -30,7 +30,7 @@ export const categoriesSlice = createSlice({
       };
       state.products.push(newProduct);
     },
-    addProductToRow: (state, action: PayloadAction<{ rowId: string; product: Product; alignment: "dropZone" }>) => {
+    addProductToRow: (state, action: PayloadAction<{ rowId: string; product: Product; alignment: "left" | "center" | "right" }>) => {
       const { rowId, product, alignment } = action.payload;
 
       state.rows.forEach((row) => {
